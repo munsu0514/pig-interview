@@ -6,7 +6,7 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, 'data', 'evaluations.json');
-const XLSX_FILE = path.join(__dirname, '2026-1 PIG 면접자&상주 명단.xlsx');
+const XLSX_FILE = path.join(__dirname, 'interview_schedule.xlsx');
 const USERS_FILE = path.join(__dirname, 'data', 'users.json');
 
 // data 폴더 없으면 생성
