@@ -200,6 +200,26 @@ app.post('/api/evaluations/:name', (req, res) => {
     };
     
     fs.writeFileSync(DATA_FILE, JSON.stringify(allData, null, 2), 'utf-8');
+    
+    // [백업용] 구글 스프레드시트 Webhook으로 데이터 전송 (비동기)
+    const GAS_WEBHOOK_URL = process.env.WEBHOOK_URL || "https://script.google.com/macros/s/AKfycbzNLf_WIx33cYxq1FnEYxb_RO9L6HxrJJnm8vKu9hMXJC_T7SWUn2p0QjDKVhoF7kd8/exec";
+    if (GAS_WEBHOOK_URL && GAS_WEBHOOK_URL.startsWith("https://script.google.com/")) {
+      const payload = {
+        applicantName,
+        judgeName,
+        ...evalData
+      };
+      
+      // 서버 성능에 영향을 주지 않기 위해 비동기로 던짐 (await 안 씀)
+      fetch(GAS_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(r => r.text())
+        .then(t => console.log(`[Backup Success] ${applicantName} - ${judgeName}`))
+        .catch(err => console.error(`[Backup Failed]`, err));
+    }
+    
     res.json(allData);
   } catch (e) {
     res.status(500).json({ error: e.message });
