@@ -1,0 +1,1526 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PIG 2026-1 면접 도우미</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0f1a;
+      --surface: #161929;
+      --surface2: #1e2236;
+      --border: #2a2f4a;
+      --accent: #6c63ff;
+      --accent2: #48d1cc;
+      --accent3: #ff6b9d;
+      --text: #e8eaf6;
+      --text-dim: #8892b0;
+      --success: #4caf82;
+      --warning: #f5a623;
+      --danger: #ff5370;
+      --card-radius: 14px;
+    }
+
+    body {
+      font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #1a1d2e 0%, #161929 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-badge {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 14px; color: #fff;
+    }
+    .header-title { font-size: 18px; font-weight: 700; color: var(--text); }
+    .header-clock {
+      font-size: 15px; font-weight: 600;
+      color: var(--accent2);
+      letter-spacing: 1px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Tabs ── */
+    .tab-bar {
+      display: flex;
+      gap: 4px;
+      padding: 16px 32px 0;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .tab-btn {
+      padding: 10px 24px;
+      border: none;
+      background: transparent;
+      color: var(--text-dim);
+      font-size: 14px; font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      border-radius: 8px 8px 0 0;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover { color: var(--text); background: var(--surface2); }
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      background: var(--surface2);
+    }
+
+    .tab-content { display: none; padding: 28px 32px; }
+    .tab-content.active { display: block; }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--text-dim); margin-bottom: 16px;
+    }
+
+    /* ── Current Interview Panel ── */
+    .current-panel {
+      background: linear-gradient(135deg, rgba(108,99,255,0.12) 0%, rgba(72,209,204,0.08) 100%);
+      border: 1px solid rgba(108,99,255,0.35);
+      border-radius: var(--card-radius);
+      padding: 28px;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .current-panel::before {
+      content: '';
+      position: absolute; top: 0; left: 0;
+      width: 4px; height: 100%;
+      background: linear-gradient(to bottom, var(--accent), var(--accent2));
+    }
+    .current-label {
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 2px;
+      color: var(--accent2); margin-bottom: 10px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .pulse-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent2);
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+    .current-name {
+      font-size: 32px; font-weight: 800;
+      color: var(--text); margin-bottom: 8px; line-height: 1.2;
+    }
+    .current-time {
+      font-size: 14px; color: var(--text-dim); margin-bottom: 16px;
+    }
+    .judges-row {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    .judge-chip {
+      padding: 4px 12px;
+      background: rgba(108,99,255,0.2);
+      border: 1px solid rgba(108,99,255,0.4);
+      border-radius: 20px;
+      font-size: 13px; font-weight: 500;
+      color: #a89fff;
+    }
+
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center; padding: 40px 20px;
+      color: var(--text-dim);
+    }
+    .empty-icon { font-size: 36px; margin-bottom: 12px; }
+    .empty-text { font-size: 15px; }
+
+    /* ── Schedule table ── */
+    .schedule-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { border-bottom: 2px solid var(--border); }
+    th {
+      padding: 10px 16px;
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px;
+      color: var(--text-dim); text-align: left;
+    }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+    tbody tr:hover { background: var(--surface2); }
+    tbody tr.row-break { background: rgba(108,99,255,0.05); }
+    td {
+      padding: 12px 16px;
+      font-size: 14px; color: var(--text);
+    }
+    td.time-cell { color: var(--text-dim); font-variant-numeric: tabular-nums; }
+    td.applicant-cell { font-weight: 600; }
+    td.empty-slot { color: var(--text-dim); font-style: italic; }
+    .break-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      background: rgba(245,166,35,0.15);
+      border: 1px solid rgba(245,166,35,0.3);
+      border-radius: 10px;
+      font-size: 12px; color: var(--warning);
+    }
+
+    /* Date filter */
+    .date-filter {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;
+    }
+    .date-chip {
+      padding: 6px 16px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: transparent;
+      color: var(--text-dim);
+      font-size: 13px; font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .date-chip:hover { border-color: var(--accent); color: var(--accent); }
+    .date-chip.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* ── Tab 2: Evaluation ── */
+    .eval-scenario-panel {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .scenario-header {
+      padding: 16px 20px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: background 0.2s;
+    }
+    .scenario-header:hover { background: rgba(108,99,255,0.1); }
+    .scenario-title { font-size: 14px; font-weight: 700; color: var(--accent2); display:flex; align-items:center; gap:8px; }
+    .scenario-toggle-icon { transition: transform 0.3s; color: var(--text-dim); }
+    .scenario-content {
+      padding: 0 20px 20px;
+      display: none;
+      font-size: 13px; color: var(--text); line-height: 1.6;
+    }
+    .scenario-content.open { display: block; }
+    .scenario-content h4 { color: var(--accent); margin-top: 12px; margin-bottom: 4px; font-size:14px; }
+    .scenario-content p { margin-bottom: 8px; color: var(--text-dim); padding-left:12px; border-left:2px solid var(--border); }
+    
+    .eval-layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 1024px) {
+      .eval-layout { grid-template-columns: 1fr; }
+    }
+    
+    .applicant-list-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+      overflow: hidden;
+    }
+    .list-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--text-dim);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .applicant-search {
+      width: 100%;
+      padding: 10px 16px;
+      background: var(--surface2);
+      border: none;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      font-size: 13px; font-family: inherit;
+      outline: none;
+    }
+    .applicant-search::placeholder { color: var(--text-dim); }
+    
+    .applicant-item-container {
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+
+    .applicant-item {
+      padding: 12px 20px;
+      cursor: pointer;
+      transition: background 0.15s;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .applicant-item:hover { background: var(--surface2); }
+    .applicant-item.active {
+      background: rgba(108,99,255,0.15);
+      border-left: 3px solid var(--accent);
+    }
+    .applicant-item-name { font-size: 14px; font-weight: 500; }
+    .applicant-item-date { font-size: 11px; color: var(--text-dim); }
+    .eval-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--success); flex-shrink: 0;
+    }
+
+    /* Evaluation form */
+    .eval-form-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+      padding: 28px;
+    }
+    .eval-applicant-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px; padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .eval-applicant-name {
+      font-size: 24px; font-weight: 800; color: var(--text);
+    }
+    .eval-applicant-meta {
+      font-size: 13px; color: var(--text-dim); margin-top: 4px;
+    }
+    .save-btn {
+      padding: 10px 24px;
+      background: linear-gradient(135deg, var(--accent), #8b7fff);
+      border: none; border-radius: 10px;
+      color: #fff; font-size: 14px; font-weight: 700;
+      font-family: inherit; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .save-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(108,99,255,0.35); }
+    .save-btn:active { transform: translateY(0); }
+
+    .split-form {
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+    }
+    @media (max-width: 900px) {
+      .split-form { flex-direction: column; }
+    }
+
+    .form-column { flex: 1; display: flex; flex-direction: column; gap: 24px; }
+    .split-form > .form-column:first-child { flex: 1.5; }
+    
+    .right-column {
+      position: sticky;
+      top: 84px; /* header + some padding */
+    }
+    
+    .form-section-label {
+      font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--accent2); margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .form-section-label::after {
+      content: ''; flex: 1;
+      height: 1px; background: var(--border);
+    }
+
+    .qa-item {
+      margin-bottom: 16px;
+      background: var(--surface2);
+      border-radius: 10px;
+      padding: 16px;
+      border: 1px solid var(--border);
+    }
+    .qa-label { font-size: 13px; font-weight: 600; color: var(--accent); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    
+    .qa-input-title {
+      width: 100%;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      margin-bottom: 8px;
+      transition: border-color 0.2s;
+    }
+    .qa-input-title:focus { border-color: var(--accent); }
+
+    .memo-area {
+      width: 100%;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: inherit;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .qa-item .memo-area { min-height: 80px; }
+    .form-column .memo-area { min-height: 200px; }
+    
+    .memo-area:focus { border-color: var(--accent); }
+
+    .add-q-btn {
+      width: 100%;
+      padding: 10px;
+      background: transparent;
+      border: 1px dashed var(--accent);
+      color: var(--accent);
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: inherit; font-size: 13px; font-weight: 600;
+      transition: all 0.2s;
+      margin-top: 8px;
+    }
+    .add-q-btn:hover { background: rgba(108,99,255,0.1); }
+    
+    .remove-q-btn {
+      background: rgba(255, 83, 112, 0.1);
+      color: var(--danger);
+      border: 1px solid rgba(255, 83, 112, 0.3);
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .remove-q-btn:hover {
+      background: rgba(255, 83, 112, 0.2);
+      border-color: var(--danger);
+    }
+
+    .pass-fail-group {
+      display: flex; gap: 12px; margin-bottom: 24px;
+    }
+    .pf-radio-label {
+      flex: 1;
+      display: flex; align-items: center; justify-content: center;
+      padding: 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px; font-weight: 700; color: var(--text-dim);
+      transition: all 0.2s;
+    }
+    .pf-radio-label input { display: none; }
+    .pf-radio-label:has(input[value="pass"]:checked) {
+      background: rgba(76, 175, 130, 0.15); /* success */
+      border-color: var(--success);
+      color: var(--success);
+    }
+    .pf-radio-label:has(input[value="fail"]:checked) {
+      background: rgba(255, 83, 112, 0.15); /* danger */
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+    
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      padding: 12px 20px;
+      background: var(--success);
+      color: #fff; font-size: 14px; font-weight: 600;
+      border-radius: 10px;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 999;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    .no-eval-selected {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      min-height: 300px;
+      color: var(--text-dim); text-align: center;
+    }
+    .no-eval-icon { font-size: 48px; margin-bottom: 16px; }
+
+    /* Modal */
+    .modal {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 10000;
+    }
+    .modal-content {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; width: 100%; max-width: 400px; padding: 32px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      max-height: 90vh; display: flex; flex-direction: column;
+    }
+    .modal-body { overflow-y: auto; overflow-x: hidden; padding-right: 4px; }
+    /* 스크롤바 스타일링 */
+    .modal-body::-webkit-scrollbar { width: 6px; }
+    .modal-body::-webkit-scrollbar-track { background: transparent; }
+    .modal-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+    .modal-body::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+    .modal-header { font-size: 20px; font-weight: 800; margin-bottom: 20px; color: var(--text); text-align: center; }
+    .judge-select-btn {
+      width: 100%; padding: 16px; margin-bottom: 12px;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+      color: white; border-radius: 12px; cursor: pointer;
+      font-size: 15px; font-weight: 600; text-align: center;
+      transition: all 0.2s;
+    }
+    .judge-select-btn:hover { background: var(--accent); border-color: var(--accent); transform: translateY(-2px); }
+
+    .eval-tabs { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+    .eval-tab-item {
+      padding: 6px 16px; font-size: 13px; font-weight: 700; color: var(--text-dim);
+      cursor: pointer; border-radius: 20px; transition: all 0.2s;
+    }
+    .eval-tab-item.active { background: var(--accent); color: white; }
+
+    .summary-card {
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px; margin-bottom: 16px;
+    }
+    .summary-judge { font-size: 12px; font-weight: 800; color: var(--accent2); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .summary-content { font-size: 13px; color: var(--text); line-height: 1.6; white-space: pre-wrap; }
+    .summary-pf { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-left: auto; }
+    .pf-pass { background: rgba(76, 175, 130, 0.2); color: var(--success); }
+    .pf-fail { background: rgba(255, 83, 112, 0.2); color: var(--danger); }
+    
+    .summary-detail-toggle {
+      width: 100%; padding: 8px; margin-top: 12px;
+      background: rgba(108,99,255,0.1); border: 1px solid rgba(108,99,255,0.2);
+      color: var(--accent); border-radius: 8px; cursor: pointer;
+      font-size: 11px; font-weight: 700; transition: all 0.2s;
+    }
+    .summary-detail-toggle:hover { background: rgba(108,99,255,0.2); }
+    .summary-details {
+      display: none; padding: 12px; margin-top: 10px;
+      background: rgba(0,0,0,0.2); border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .summary-details.open { display: block; }
+    .detail-item { margin-bottom: 8px; }
+    .detail-label { font-size: 10px; font-weight: 800; color: var(--accent2); margin-bottom: 2px; }
+    .detail-text { font-size: 12px; color: var(--text-dim); line-height: 1.4; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .tab-bar { padding: 12px 16px 0; }
+      .tab-content { padding: 16px; }
+      .header { padding: 0 16px; }
+      .eval-layout { grid-template-columns: 1fr; }
+      .current-name { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-logo">
+    <div class="logo-badge" onclick="toggleDevMode()" style="cursor:pointer;" title="시간 테스트 툴 열기">PIG</div>
+    <span class="header-title">2026-1 면접 도우미</span>
+  </div>
+  <div id="judge-info" style="font-size:13px; color:var(--text-dim); margin-left:20px; background:rgba(255,255,255,0.05); padding:6px 12px; border-radius:20px; cursor:pointer;" onclick="showJudgeModal()">
+    👤 <span id="current-judge-name">심사위원 선택 필요</span>
+  </div>
+  <div class="header-clock" id="clock">--:--:--</div>
+</header>
+
+<!-- Judge Selection Modal -->
+<div id="judge-modal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <div class="modal-header">👤 심사위원 본인 확인</div>
+    <div class="modal-body">
+      <div style="background:rgba(255,83,112,0.1); border:1px solid rgba(255,83,112,0.3); padding:12px; border-radius:10px; margin-bottom:20px;">
+        <p style="color:var(--danger); font-size:13px; font-weight:800; margin:0; line-height:1.5;">
+          ⚠️ 주의: 다른 심사위원의 프로필을 선택하지 않도록 각별히 주의해 주세요. 본인의 이름만 선택해야 합니다.
+        </p>
+      </div>
+      <div id="judge-selection-list">
+        <!-- JS로 심사위원 목록 렌더링 -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Dev Panel (Hidden by default) -->
+<div id="dev-panel" style="display:none; position:fixed; top:70px; left:32px; background:var(--surface); border:1px solid var(--border); padding:16px; border-radius:10px; z-index:9999; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+  <div style="font-size:12px; font-weight:700; color:var(--accent2); margin-bottom:12px;">🛠 시간 테스트 툴</div>
+  <div style="margin-bottom:8px;">
+    <label style="font-size:11px; color:var(--text-dim);">날짜 (YYYY.MM.DD)</label><br>
+    <input type="text" id="dev-date" placeholder="예: 2026.03.16" style="background:var(--surface2); color:white; border:1px solid var(--border); padding:6px; border-radius:4px; font-size:12px;">
+  </div>
+  <div style="margin-bottom:12px;">
+    <label style="font-size:11px; color:var(--text-dim);">시간 (HH:MM)</label><br>
+    <input type="text" id="dev-time" placeholder="예: 11:30" style="background:var(--surface2); color:white; border:1px solid var(--border); padding:6px; border-radius:4px; font-size:12px;">
+  </div>
+  <div style="display:flex; gap:8px;">
+    <button onclick="applyDevTime()" style="padding:6px 12px; background:var(--accent); border:none; border-radius:4px; color:white; font-size:11px; cursor:pointer;">적용</button>
+    <button onclick="resetDevTime()" style="padding:6px 12px; background:transparent; border:1px solid var(--border); border-radius:4px; color:var(--text); font-size:11px; cursor:pointer;">초기화</button>
+  </div>
+</div>
+
+<!-- Tab Bar -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('queue')">📋 면접 대기열</button>
+  <button class="tab-btn" onclick="switchTab('eval')">📝 면접 평가지</button>
+</div>
+
+<!-- ═══════════════════════════════════════
+     Tab 1: 면접 대기열
+════════════════════════════════════════ -->
+<div id="tab-queue" class="tab-content active">
+
+  <!-- 현재 진행 중 -->
+  <div id="current-panel" class="current-panel">
+    <div class="empty-state">
+      <div class="empty-icon">⏳</div>
+      <div class="empty-text">면접 일정을 불러오는 중...</div>
+    </div>
+  </div>
+
+  <!-- 다음 대기열 -->
+  <div class="card">
+    <div class="card-title">📅 전체 일정</div>
+    <div class="date-filter" id="date-filter"></div>
+    <div class="schedule-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>시작</th>
+            <th>종료</th>
+            <th>면접자</th>
+            <th>심사위원</th>
+          </tr>
+        </thead>
+        <tbody id="schedule-body">
+          <tr><td colspan="4" class="empty-state"><div class="empty-text">로딩 중...</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     Tab 2: 면접 평가지
+════════════════════════════════════════ -->
+<div id="tab-eval" class="tab-content">
+
+  <!-- 면접 시나리오 -->
+  <div class="eval-scenario-panel">
+    <div class="scenario-header" onclick="toggleScenario()">
+      <div class="scenario-title">📖 면접 시나리오 가이드 (클릭하여 펼치기)</div>
+      <div class="scenario-toggle-icon" id="scenario-icon">▼</div>
+    </div>
+    <div class="scenario-content" id="scenario-content">
+      <h4>0. 녹음 안내</h4>
+      <p>안녕하세요! 앞에 앉아주시면 됩니다!<br>동아리 내부 기록과 평가를 위해서 면접 내용 녹음을 진행하려고 하는데요, 동의하시나요?</p>
+      
+      <h4>1. 자기소개</h4>
+      <p>그럼 면접 시작하겠습니다. 간단하게 자기소개 부탁드립니다.</p>
+      
+      <h4>2. 지원동기</h4>
+      <p>저희 동아리에 지원하시게 된 계기나 특별한 이유가 있으신가요?</p>
+      
+      <h4>3. 사진소개</h4>
+      <p>직접 찍었던 사진들 중에 가장 좋아하는 사진이 있으시다면 서류 지원에 사용하신 거 제외하고 보여주실 수 있나요?<br>+ 제출해주신 사진에 대한 간략한 설명 부탁드립니다!</p>
+      
+      <h4>4. 활동 참여 가능 여부</h4>
+      <p>저희 동아리는 이번 상반기에 10주에 걸쳐서 총 10번의 정기 출사를 계획하고 있습니다. 대략적으로 몇 번 정도 참여 가능하신가요?<br>(참여 가능 여부는 개인 일정에 따라 다를 수 있으니 부담 갖지 마시고 편하게 말씀해주세요!)</p>
+      
+      <h4>5. 사진에 대한 생각</h4>
+      <p>자신에게 있어서 사진이란 무엇인가요? (사진이 좋은 이유?)</p>
+      
+      <h4>02. 면접 개별 질문</h4>
+      <p>+ 디자인학부 소속인 면접자인 경우 아래 질문 꼭 해주세요!<br>
+      - 디자인 툴(포토샵, 일러스트 등) 사용 가능하신가요?<br>
+      - 디자인팀 신입 임원진으로 활동하실 생각 있으신가요? (주요 활동: 카드뉴스, 포스터 제작)<br>
+      -> 이외의 질문은 임원진 여러분께서 자유롭게 하시면 될 것 같습니다! 2-3개 정도의 질문 준비해 주세요!</p>
+      
+      <h4>03. 마무리</h4>
+      <p>마지막으로 하고 싶은 말 있으시면 말씀해주세요!</p>
+    </div>
+  </div>
+
+  <div class="eval-layout">
+
+    <!-- 면접자 목록 -->
+    <div class="applicant-list-panel">
+      <div class="list-header">
+        <span>면접자 목록</span>
+        <span id="applicant-count" style="font-weight:400;color:var(--accent)"></span>
+      </div>
+      <input class="applicant-search" id="applicant-search" placeholder="이름 검색..." oninput="filterApplicants()" />
+      <div class="applicant-item-container" id="applicant-list"></div>
+    </div>
+
+    <!-- 평가 폼 -->
+    <div class="eval-form-panel">
+      <div id="eval-form-inner">
+        <div class="no-eval-selected">
+          <div class="no-eval-icon">👈</div>
+          <div>왼쪽 목록에서 면접자를 선택하세요</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">✅ 저장되었습니다!</div>
+
+<script>
+// ══════════════════════════════════════
+// 전역 상태
+// ══════════════════════════════════════
+let schedule = [];
+let evaluations = {};
+let selectedApplicant = null;
+let selectedDate = 'all';
+let currentJudge = localStorage.getItem('pig_judge') || null;
+let adminPassword = localStorage.getItem('pig_admin_pwd') || null; // for admin sessions
+let currentEvalTab = 'form'; // 'form' or 'summary'
+
+// 동적 질문 ID 관리를 위한 카운터
+let customQuestionCount = 0;
+
+function showJudgeModal() {
+  const judgeSet = new Set();
+  schedule.forEach(row => {
+    if (row.judges) {
+      row.judges.split('/').forEach(name => {
+        const trimmed = name.trim();
+        if (trimmed) judgeSet.add(trimmed);
+      });
+    }
+  });
+  
+  const judges = Array.from(judgeSet).sort();
+  
+  const list = document.getElementById('judge-selection-list');
+  list.innerHTML = judges.map(j => `
+    <button class="judge-select-btn" onclick="selectJudgeStart('${j}')">${j}</button>
+  `).join('');
+  list.innerHTML += `<div style="height:1px; background:var(--border); margin:16px 0;"></div>`;
+  list.innerHTML += `<button class="judge-select-btn" style="background:var(--surface2);border-color:var(--text-dim);" onclick="selectJudgeStart('admin')">👑 관리자 (Admin) 로그인</button>`;
+  
+  const modalHeader = document.querySelector('.modal-header');
+  if (modalHeader) {
+      modalHeader.innerHTML = '👤 심사위원 로그인 <button onclick="document.getElementById(\'judge-modal\').style.display=\'none\'" style="float:right; background:transparent; border:none; color:white; font-size:16px; cursor:pointer;">✕</button>';
+  }
+  document.getElementById('judge-modal').style.display = 'flex';
+}
+
+let pendingJudge = null;
+async function selectJudgeStart(name) {
+  pendingJudge = name;
+  const list = document.getElementById('judge-selection-list');
+  try {
+    const res = await fetch('/api/auth/check', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ judgeName: name })
+    });
+    const info = await res.json();
+    
+    // Show password UI
+    list.innerHTML = `
+      <div style="text-align:center; margin-bottom:16px;">
+        <div style="font-size:16px; font-weight:700; color:var(--accent2); margin-bottom:8px;">${name === 'admin' ? '👑 관리자' : '👤 ' + name}</div>
+        <div style="font-size:13px; color:var(--text-dim);">
+          ${info.hasPassword ? '비밀번호 4자리를 입력해주세요.' : '최초 1회 사용할 비밀번호 4자리를 설정해주세요.'}
+        </div>
+      </div>
+      <input type="password" id="judge-pin-input" maxlength="4" placeholder="****" style="width:100%; padding:16px; font-size:24px; text-align:center; letter-spacing:8px; background:rgba(0,0,0,0.2); border:1px solid var(--border); color:white; border-radius:12px; margin-bottom:12px;">
+      <button class="save-btn" style="width:100%" onclick="submitJudgePin(${info.hasPassword})">확인</button>
+      <button onclick="showJudgeModal()" style="width:100%; padding:12px; background:transparent; border:none; color:var(--text-dim); margin-top:8px; cursor:pointer;">뒤로 가기</button>
+    `;
+    setTimeout(() => document.getElementById('judge-pin-input').focus(), 100);
+  } catch (e) {
+    alert('인증 서버 연결 실패: ' + e.message);
+  }
+}
+
+async function submitJudgePin(hasPassword) {
+  const pin = document.getElementById('judge-pin-input').value;
+  if (!/^\d{4}$/.test(pin)) {
+    return alert('비밀번호는 4자리 숫자여야 합니다.');
+  }
+  try {
+    const url = hasPassword ? '/api/auth/login' : '/api/auth/setup';
+    const res = await fetch(url, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ judgeName: pendingJudge, password: pin })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+       if (pendingJudge === 'admin') {
+         adminPassword = pin;
+         localStorage.setItem('pig_admin_pwd', pin);
+       } else {
+         adminPassword = null;
+         localStorage.removeItem('pig_admin_pwd');
+       }
+       setJudge(pendingJudge);
+    } else {
+       alert(data.error || '비밀번호 확인 실패');
+    }
+  } catch (e) {
+    alert('에러 발생: ' + e.message);
+  }
+}
+
+function setJudge(name) {
+  currentJudge = name;
+  localStorage.setItem('pig_judge', name);
+  document.getElementById('current-judge-name').textContent = name;
+  document.getElementById('judge-modal').style.display = 'none';
+  if (selectedApplicant) renderEvalForm(selectedApplicant);
+}
+
+// ══════════════════════════════════════
+// 시나리오 토글
+// ══════════════════════════════════════
+function toggleScenario() {
+  const content = document.getElementById('scenario-content');
+  const icon = document.getElementById('scenario-icon');
+  if (content.classList.contains('open')) {
+    content.classList.remove('open');
+    icon.style.transform = 'rotate(0deg)';
+  } else {
+    content.classList.add('open');
+    icon.style.transform = 'rotate(180deg)';
+  }
+}
+
+// ══════════════════════════════════════
+// 시계
+// ══════════════════════════════════════
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const s = String(now.getSeconds()).padStart(2,'0');
+  document.getElementById('clock').textContent = `🕒 현재 시각 ${h}:${m}:${s}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ══════════════════════════════════════
+// Tab 전환
+// ══════════════════════════════════════
+function switchTab(tab) {
+  if (tab === 'eval' && !currentJudge) {
+    alert('면접 평가지 탭에 접근하려면 로그인이 필요합니다.');
+    showJudgeModal();
+    return;
+  }
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  const idx = tab === 'queue' ? 0 : 1;
+  document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+// ══════════════════════════════════════
+// 날짜 변환 유틸
+// ══════════════════════════════════════
+// ══════════════════════════════════════
+// 날짜 변환 유틸 (테스트용 오버라이드 포함)
+// ══════════════════════════════════════
+let mockDate = null;
+let mockTimeStr = null;
+
+function todayStr() {
+  if (mockDate) return mockDate;
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth()+1).padStart(2,'0');
+  const d = String(now.getDate()).padStart(2,'0');
+  return `${y}.${m}.${d}`;
+}
+
+function timeStrToMinutes(str) {
+  const [h, m] = str.split(':').map(Number);
+  return h * 60 + m;
+}
+
+function currentMinutes() {
+  if (mockTimeStr) return timeStrToMinutes(mockTimeStr);
+  const now = new Date();
+  return now.getHours() * 60 + now.getMinutes();
+}
+
+// 개발자 테스트용 시간 설정 창 토글
+function toggleDevMode() {
+  const devPanel = document.getElementById('dev-panel');
+  if (devPanel.style.display === 'none') {
+    devPanel.style.display = 'block';
+  } else {
+    devPanel.style.display = 'none';
+  }
+}
+
+function applyDevTime() {
+  const d = document.getElementById('dev-date').value; // YYYY.MM.DD
+  const t = document.getElementById('dev-time').value; // HH:MM
+  mockDate = d || null;
+  mockTimeStr = t || null;
+  renderCurrentPanel();
+  renderScheduleTable();
+  renderApplicantList();
+  if (mockTimeStr) {
+    document.getElementById('clock').textContent = `🕒 현재 시각(T) ${mockTimeStr}:00`;
+  }
+}
+
+function resetDevTime() {
+  mockDate = null;
+  mockTimeStr = null;
+  document.getElementById('dev-date').value = '';
+  document.getElementById('dev-time').value = '';
+  updateClock();
+  renderCurrentPanel();
+  renderScheduleTable();
+  renderApplicantList();
+}
+
+// ══════════════════════════════════════
+// 면접 대기열 렌더링
+// ══════════════════════════════════════
+async function loadSchedule() {
+  try {
+    const res = await fetch('/api/schedule');
+    schedule = await res.json();
+    renderDateFilter();
+    renderCurrentPanel();
+    renderScheduleTable();
+  } catch(e) {
+    document.getElementById('current-panel').innerHTML =
+      `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">데이터 로드 실패: ${e.message}</div></div>`;
+  }
+}
+
+function renderDateFilter() {
+  const dates = [...new Set(schedule.map(r => r.date))].sort();
+  const filter = document.getElementById('date-filter');
+  filter.innerHTML = `<button class="date-chip ${selectedDate==='all'?'active':''}" onclick="selectDate('all')">전체</button>`;
+  dates.forEach(d => {
+    const label = d.replace('2026.', '').replace(/^0/, '');
+    const isSel = selectedDate === d;
+    filter.innerHTML += `<button class="date-chip ${isSel?'active':''}" onclick="selectDate('${d}')">${label}</button>`;
+  });
+}
+
+function selectDate(d) {
+  selectedDate = d;
+  renderDateFilter();
+  renderScheduleTable();
+}
+
+function renderCurrentPanel() {
+  const today = todayStr();
+  const now = currentMinutes();
+  const panel = document.getElementById('current-panel');
+
+  // 오늘 슬롯 중 현재 진행 중인 면접 찾기
+  const current = schedule.find(r =>
+    r.date === today &&
+    timeStrToMinutes(r.startTime) <= now &&
+    timeStrToMinutes(r.endTime) > now
+  );
+
+  // 다음 면접자
+  const upcomingWithApplicant = schedule.filter(r =>
+    r.date === today &&
+    r.applicant !== 'X' &&
+    timeStrToMinutes(r.startTime) > now
+  );
+  const next = upcomingWithApplicant[0] || null;
+
+  if (!current && !next) {
+    panel.innerHTML = `
+      <div class="current-label"><div class="pulse-dot"></div> 현재 진행 중</div>
+      <div class="empty-state" style="padding:20px 0">
+        <div class="empty-text">현재 진행 중인 면접이 없습니다</div>
+      </div>`;
+    return;
+  }
+
+  const mainSlot = current || next;
+  const isBreak = mainSlot && mainSlot.applicant === 'X';
+  const judges = mainSlot ? mainSlot.judges.split('/').map(j => j.trim()).filter(Boolean) : [];
+
+  panel.innerHTML = `
+    <div class="current-label">
+      <div class="pulse-dot"></div>
+      ${current ? '현재 진행 중' : '다음 면접 대기'}
+    </div>
+    <div class="current-name">${isBreak ? '— 휴식 / 빈 시간 —' : mainSlot.applicant}</div>
+    <div class="current-time">
+      ${mainSlot.date} &nbsp;|&nbsp; ${mainSlot.startTime} ~ ${mainSlot.endTime}
+    </div>
+    <div class="judges-row">
+      ${judges.map(j => `<div class="judge-chip">👤 ${j}</div>`).join('')}
+    </div>
+    ${next && current ? `
+      <div style="margin-top:20px; padding-top:16px; border-top: 1px solid rgba(108,99,255,0.2);">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text-dim);margin-bottom:6px;">다음 대기</div>
+        <div style="font-size:16px;font-weight:700;color:var(--accent2)">${next.applicant}  <span style="font-size:13px;font-weight:400;color:var(--text-dim)">${next.startTime}</span></div>
+      </div>` : ''}
+  `;
+}
+
+function renderScheduleTable() {
+  // 휴식 시간('X') 제외 및 날짜 필터링
+  const activeSchedule = schedule.filter(r => r.applicant !== 'X');
+  const filtered = selectedDate === 'all' ? activeSchedule : activeSchedule.filter(r => r.date === selectedDate);
+  const tbody = document.getElementById('schedule-body');
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="empty-text">일정이 없습니다</div></div></td></tr>`;
+    return;
+  }
+
+  const today = todayStr();
+  const now = currentMinutes();
+
+  let html = '';
+  let prevDate = null;
+
+  filtered.forEach(row => {
+    if (row.date !== prevDate) {
+      if (prevDate !== null) {
+        html += `<tr><td colspan="4" style="padding:4px;"></td></tr>`;
+      }
+      html += `<tr class="row-break"><td colspan="4" style="padding:8px 16px;font-size:12px;font-weight:700;color:var(--text-dim);letter-spacing:1px">${row.date}</td></tr>`;
+      prevDate = row.date;
+    }
+
+    const startMin = timeStrToMinutes(row.startTime);
+    const endMin = timeStrToMinutes(row.endTime);
+    const isNow = row.date === today && startMin <= now && endMin > now;
+    const isPast = row.date < today || (row.date === today && endMin <= now);
+
+    const rowStyle = isNow
+      ? 'background: rgba(108,99,255,0.12); border-left: 3px solid var(--accent);'
+      : isPast ? 'opacity:0.45;' : '';
+
+    const judges = row.judges.split('/').map(j => j.trim()).filter(Boolean);
+
+    html += `
+      <tr style="${rowStyle}">
+        <td class="time-cell">${row.startTime}</td>
+        <td class="time-cell">${row.endTime}</td>
+        <td class="applicant-cell">
+          ${row.applicant + (isNow ? ' <span style="font-size:11px;color:var(--accent)">● 진행 중</span>' : '')}
+        </td>
+        <td style="font-size:13px;color:var(--text-dim)">${judges.join(' &nbsp;/&nbsp; ')}</td>
+      </tr>`;
+  });
+
+  tbody.innerHTML = html;
+}
+
+// ══════════════════════════════════════
+// 면접 평가지
+// ══════════════════════════════════════
+async function loadEvaluations() {
+  try {
+    const res = await fetch('/api/evaluations');
+    evaluations = await res.json();
+  } catch(e) { evaluations = {}; }
+  renderApplicantList();
+}
+
+function getApplicants() {
+  return schedule.filter(r => r.applicant !== 'X')
+    .reduce((acc, r) => {
+      if (!acc.find(a => a.name === r.applicant)) {
+        acc.push({ name: r.applicant, date: r.date, time: r.startTime });
+      }
+      return acc;
+    }, [])
+    .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
+}
+
+function filterApplicants() {
+  const q = document.getElementById('applicant-search').value.toLowerCase();
+  document.querySelectorAll('.applicant-item').forEach(el => {
+    el.style.display = el.dataset.name.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+function renderApplicantList() {
+  const applicants = getApplicants();
+  const list = document.getElementById('applicant-list');
+  document.getElementById('applicant-count').textContent = `${applicants.length}명`;
+
+  const today = todayStr();
+  const nowMin = currentMinutes();
+
+  // 현재 진행 여부를 계산하고 배열에 추가
+  const processedApplicants = applicants.map(a => {
+    let isCurrent = false;
+    const sch = schedule.find(r => r.applicant === a.name && r.date === a.date && r.startTime === a.time);
+    if (sch && sch.date === today) {
+       const start = timeStrToMinutes(sch.startTime);
+       const end = timeStrToMinutes(sch.endTime);
+       if (nowMin >= start && nowMin < end) isCurrent = true;
+    }
+    return { ...a, isCurrent };
+  });
+
+  // 진행 중인 면접자가 위로 오도록 정렬 (stable sort 유지)
+  processedApplicants.sort((a, b) => {
+    if (a.isCurrent && !b.isCurrent) return -1;
+    if (!a.isCurrent && b.isCurrent) return 1;
+    return 0;
+  });
+
+  list.innerHTML = processedApplicants.map(a => {
+    const applicantEvals = evaluations[a.name] || {};
+    // 진짜 심사위원 데이터(객체이면서 내부에 updatedAt 필드가 있음)가 있는지 확인
+    const hasEval = Object.keys(applicantEvals).some(k => {
+      const entry = applicantEvals[k];
+      return entry && typeof entry === 'object' && entry.updatedAt;
+    });
+    const isActive = selectedApplicant === a.name;
+
+    return `
+      <div class="applicant-item ${isActive ? 'active' : ''}"
+           data-name="${a.name}"
+           onclick="selectApplicant('${a.name}')">
+        <div>
+          <div class="applicant-item-name">
+            ${a.name} 
+            ${a.isCurrent ? '<span style="font-size:10px; color:var(--accent2); font-weight:700; background:rgba(72,209,204,0.15); padding:2px 6px; border-radius:10px; margin-left:6px;">진행 중</span>' : ''}
+          </div>
+            <div class="applicant-item-date">${a.date} ${a.time}</div>
+          </div>
+        </div>
+      `;
+  }).join('');
+}
+
+function selectApplicant(name) {
+  selectedApplicant = name;
+  customQuestionCount = 0;
+  renderApplicantList();
+  renderEvalForm(name);
+}
+
+function renderEvalForm(name) {
+  const applicantInfo = schedule.find(r => r.applicant === name);
+  const applicantEvals = evaluations[name] || {};
+  const saved = applicantEvals[currentJudge] || {};
+  const judges = applicantInfo ? applicantInfo.judges.split('/').map(j=>j.trim()).filter(Boolean) : [];
+
+  const initialQuestions = saved.customQA || [];
+  customQuestionCount = initialQuestions.length;
+
+  let customHtml = '';
+  initialQuestions.forEach((qa, idx) => {
+    customHtml += generateCustomQAHTML(idx, qa.q, qa.a);
+  });
+
+  const isModeAdmin = currentJudge === 'admin';
+
+  const inner = document.getElementById('eval-form-inner');
+  inner.innerHTML = `
+    <div class="eval-applicant-header">
+      <div>
+        <div class="eval-applicant-name">${name}</div>
+        <div class="eval-applicant-meta">
+          ${applicantInfo ? `${applicantInfo.date} ${applicantInfo.startTime}~${applicantInfo.endTime}` : ''}
+          &nbsp;|&nbsp; 담당 심사위원: ${judges.join(', ')}
+        </div>
+      </div>
+      ${!isModeAdmin ? `<button class="save-btn" onclick="saveEvaluation()">💾 현재 평가 저장</button>` : `<div style="color:var(--warning); font-size:13px; font-weight:700;">👑 어드민 (읽기 전용 모드)</div>`}
+    </div>
+
+    <div class="eval-tabs">
+      ${!isModeAdmin ? `<div class="eval-tab-item ${currentEvalTab === 'form' ? 'active' : ''}" onclick="switchEvalTab('form')">✍️ 내 평가 작성</div>` : ''}
+      <div class="eval-tab-item ${currentEvalTab === 'summary' || (isModeAdmin && currentEvalTab !== 'admin') ? 'active' : ''}" onclick="switchEvalTab('summary')">📊 전체 결과 모아보기</div>
+      ${isModeAdmin ? `<div class="eval-tab-item ${currentEvalTab === 'admin' ? 'active' : ''}" onclick="switchEvalTab('admin')">🛡️ 데이터 및 권한 관리</div>` : ''}
+    </div>
+
+    <div id="eval-tab-content">
+      ${(currentEvalTab === 'form' && !isModeAdmin) ? renderFormUI(saved, customHtml) : (currentEvalTab === 'admin' && isModeAdmin ? renderAdminUI(applicantEvals) : renderSummaryUI(applicantEvals))}
+    </div>
+  `;
+}
+
+function switchEvalTab(tab) {
+  currentEvalTab = tab;
+  if (selectedApplicant) renderEvalForm(selectedApplicant);
+}
+
+function renderFormUI(saved, customHtml) {
+  return `
+    <div class="split-form">
+      <!-- 왼쪽: 평가 입력 -->
+      <div class="form-column">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 12px;">
+          <div class="form-section-label" style="margin-bottom:0;">항목별 평가 (답변 기록)</div>
+          <span style="font-size:11px; color:var(--text-dim);">💡 평가는 언제든 수정 가능합니다.</span>
+        </div>
+        
+        <div class="qa-item">
+          <div class="qa-label">1. 자기소개 평가</div>
+          <textarea class="memo-area" id="ans-intro" placeholder="답변 기록...">${saved.ansIntro || ''}</textarea>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-label">2. 지원동기 평가</div>
+          <textarea class="memo-area" id="ans-motivation" placeholder="답변 기록...">${saved.ansMotivation || ''}</textarea>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-label">3. 사진소개 평가</div>
+          <textarea class="memo-area" id="ans-photo" placeholder="답변 기록...">${saved.ansPhoto || ''}</textarea>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-label">4. 활동 참여 가능 여부</div>
+          <textarea class="memo-area" id="ans-availability" placeholder="답변 기록...">${saved.ansAvailability || ''}</textarea>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-label">5. 사진에 대한 생각</div>
+          <textarea class="memo-area" id="ans-concept" placeholder="답변 기록...">${saved.ansConcept || ''}</textarea>
+        </div>
+
+        <div class="form-section-label" style="margin-top: 20px;">6. 면접 개별 질문</div>
+        <div id="custom-qa-container">
+          ${customHtml}
+        </div>
+        <button class="add-q-btn" onclick="addCustomQuestion()">+ 개별 질문 추가</button>
+      </div>
+
+      <!-- 오른쪽: 메모 및 종합 의견 -->
+      <div class="form-column right-column">
+        <div>
+          <div class="form-section-label">최종 결정</div>
+          <div class="pass-fail-group">
+            <label class="pf-radio-label">
+              <input type="radio" name="passfail" value="pass" ${saved.passfail === 'pass' ? 'checked' : ''}> 합격
+            </label>
+            <label class="pf-radio-label">
+              <input type="radio" name="passfail" value="fail" ${saved.passfail === 'fail' ? 'checked' : ''}> 불합격
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <div class="form-section-label">면접 전체 메모</div>
+          <textarea class="memo-area" id="memo" placeholder="면접 진행 중 특이사항, 분위기 등을 자유롭게 기록...">${saved.memo || ''}</textarea>
+        </div>
+
+        <div>
+          <div class="form-section-label">종합 의견</div>
+          <textarea class="memo-area" id="opinion" placeholder="최종 합격 여부 및 그에 대한 이유...">${saved.opinion || ''}</textarea>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderSummaryUI(evals) {
+  // 진짜 심사위원 데이터인 것만 필터링 (내부에 updatedAt 필드가 있는 객체 형태)
+  const judges = Object.keys(evals).filter(k => {
+    const entry = evals[k];
+    return entry && typeof entry === 'object' && !Array.isArray(entry) && entry.updatedAt;
+  });
+  
+  if (judges.length === 0) {
+    return `<div class="no-eval-selected">아직 기록된 평가가 없습니다.</div>`;
+  }
+
+  return judges.map(j => {
+    const data = evals[j];
+    const pfLabel = data.passfail === 'pass' ? '합격' : data.passfail === 'fail' ? '불합격' : '미정';
+    const pfClass = data.passfail === 'pass' ? 'pf-pass' : data.passfail === 'fail' ? 'pf-fail' : '';
+    const updatedAt = data.updatedAt ? new Date(data.updatedAt).toLocaleString() : '날짜 정보 없음';
+    
+    return `
+      <div class="summary-card">
+        <div class="summary-judge">
+          👤 ${j} 
+          <span class="summary-pf ${pfClass}">${pfLabel}</span>
+          <span style="font-size:11px; font-weight:400; color:var(--text-dim); margin-left:8px;">${updatedAt}</span>
+        </div>
+        <div class="form-section-label" style="font-size:10px; opacity:0.7;">최종 결정 의견 (종합 의견)</div>
+        <div class="summary-content" style="margin-bottom:12px;">${data.opinion || '(의견 없음)'}</div>
+        
+        <div class="form-section-label" style="font-size:10px; opacity:0.7;">면접 전체 메모</div>
+        <div class="summary-content" style="font-size:12px;">${data.memo || '(메모 없음)'}</div>
+
+        <button class="summary-detail-toggle" onclick="toggleSummaryDetail('${j}')">
+          📝 항목별 세부 답변 기록 보기
+        </button>
+        
+        <div class="summary-details" id="details-${j}">
+          <div class="detail-item">
+            <div class="detail-label">1. 자기소개 평가</div>
+            <div class="detail-text">${data.ansIntro || '(기록 없음)'}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">2. 지원동기 평가</div>
+            <div class="detail-text">${data.ansMotivation || '(기록 없음)'}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">3. 사진소개 평가</div>
+            <div class="detail-text">${data.ansPhoto || '(기록 없음)'}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">4. 활동 참여 가능 여부</div>
+            <div class="detail-text">${data.ansAvailability || '(기록 없음)'}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">5. 사진에 대한 생각</div>
+            <div class="detail-text">${data.ansConcept || '(기록 없음)'}</div>
+          </div>
+          ${(data.customQA || []).map((qa, i) => `
+            <div class="detail-item">
+              <div class="detail-label">개별 질문 ${i+1}: ${qa.q || '질문 없음'}</div>
+              <div class="detail-text">${qa.a || '(기록 없음)'}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleSummaryDetail(judge) {
+  const el = document.getElementById('details-' + judge);
+  if (el) {
+    el.classList.toggle('open');
+    const btn = el.previousElementSibling;
+    if (el.classList.contains('open')) {
+      btn.textContent = '🔼 항목별 세부 답변 기록 닫기';
+    } else {
+      btn.textContent = '📝 항목별 세부 답변 기록 보기';
+    }
+  }
+}
+
+function generateCustomQAHTML(index, qText = '', aText = '') {
+  return `
+    <div class="qa-item custom-q-item" id="custom-q-${index}">
+      <div class="qa-label">
+        개별 질문 <button class="remove-q-btn" onclick="removeCustomQuestion(${index})">삭제</button>
+      </div>
+      <input type="text" class="qa-input-title custom-q-title" placeholder="질문 내용..." value="${qText}">
+      <textarea class="memo-area custom-q-ans" placeholder="답변 기록...">${aText}</textarea>
+    </div>
+  `;
+}
+
+function addCustomQuestion() {
+  const container = document.getElementById('custom-qa-container');
+  container.insertAdjacentHTML('beforeend', generateCustomQAHTML(customQuestionCount));
+  customQuestionCount++;
+}
+
+function removeCustomQuestion(index) {
+  const el = document.getElementById('custom-q-' + index);
+  if (el) el.remove();
+}
+
+async function saveEvaluation() {
+  if (!selectedApplicant) return;
+  if (!currentJudge) {
+    alert('심사위원을 먼저 선택해주세요.');
+    showJudgeModal();
+    return;
+  }
+
+  // Custom QA parsing
+  const customQA = [];
+  document.querySelectorAll('.custom-q-item').forEach(el => {
+    const q = el.querySelector('.custom-q-title').value.trim();
+    const a = el.querySelector('.custom-q-ans').value.trim();
+    if (q || a) {
+      customQA.push({ q, a });
+    }
+  });
+
+  const data = {
+    judgeName: currentJudge,
+    ansIntro: document.getElementById('ans-intro').value,
+    ansMotivation: document.getElementById('ans-motivation').value,
+    ansPhoto: document.getElementById('ans-photo').value,
+    ansAvailability: document.getElementById('ans-availability').value,
+    ansConcept: document.getElementById('ans-concept').value,
+    customQA: customQA,
+    passfail: document.querySelector('input[name="passfail"]:checked') ? document.querySelector('input[name="passfail"]:checked').value : null,
+    memo: document.getElementById('memo').value,
+    opinion: document.getElementById('opinion').value
+  };
+
+  try {
+    const res = await fetch(`/api/evaluations/${encodeURIComponent(selectedApplicant)}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) throw new Error('서버 에러');
+    
+    const allEvals = await res.json();
+    evaluations = allEvals; 
+    
+    // 타부서/타심사위원 데이터 갱신을 위해 렌더링
+    renderApplicantList();
+    if (selectedApplicant) renderEvalForm(selectedApplicant);
+    showToast('저장되었습니다!');
+  } catch(e) {
+    showToast('저장 실패: ' + e.message);
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = (msg.includes('실패') ? '❌ ' : '✅ ') + msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ══════════════════════════════════════
+// 초기화 & 자동 갱신
+// ══════════════════════════════════════
+async function init() {
+  await loadSchedule();
+  await loadEvaluations();
+  
+  if (currentJudge) {
+    document.getElementById('current-judge-name').textContent = currentJudge;
+  }
+  
+  // 접속하자마자 심사위원 프로필을 선택할 수 있도록 항상 모달 표시
+  showJudgeModal();
+}
+
+// 30초마다 현재 패널 갱신
+setInterval(() => {
+  renderCurrentPanel();
+  renderScheduleTable();
+  renderApplicantList();
+}, 30000);
+
+function renderAdminUI(evals) {
+  // Admin utilities for the CURRENT APPLICANT
+  const judges = Object.keys(evals).filter(k => {
+    const entry = evals[k];
+    return entry && typeof entry === 'object' && !Array.isArray(entry);
+  });
+  
+  let html = `<div class="form-section-label" style="margin-top:20px; color:var(--danger)">데이터 삭제 (어드민 전용 권한)</div>`;
+  html += `<p style="font-size:13px; color:var(--text-dim); margin-bottom:16px;">해당 면접자(지원자)에 저장된 심사위원의 평가 데이터를 삭제할 수 있습니다. 실수로 추가된 테스트 데이터를 지울 때 사용하세요.</p>`;
+  
+  if (judges.length === 0) {
+    html += `<div style="padding:16px; background:rgba(0,0,0,0.2); border-radius:8px; color:var(--text-dim); text-align:center; font-size:13px;">삭제할 평가 데이터가 없습니다.</div>`;
+  } else {
+    judges.forEach(j => {
+      html += `
+        <div style="display:flex; justify-content:space-between; align-items:center; background:var(--surface2); padding:12px 16px; border-radius:8px; border:1px solid var(--border); margin-bottom:8px;">
+          <div style="font-size:14px; font-weight:600;">👤 ${j} 님의 기록</div>
+          <button style="padding:6px 16px; border-radius:6px; background:rgba(255,83,112,0.15); color:var(--danger); border:1px solid rgba(255,83,112,0.3); font-weight:700; cursor:pointer;" onclick="deleteEvalAdmin('${selectedApplicant}', '${j}')">데이터 즉시 삭제</button>
+        </div>
+      `;
+    });
+  }
+  
+  html += `<div class="form-section-label" style="margin-top:32px; color:var(--danger)">심사위원 비밀번호 초기화</div>`;
+  html += `<p style="font-size:13px; color:var(--text-dim); margin-bottom:16px;">비밀번호를 분실한 심사위원을 위해 계정 비밀번호를 영구적으로 삭제(초기화)합니다. 이후 해당 시마스위원이 다음 로그인 시 다시 새로 비밀번호를 설정할 수 있습니다.</p>`;
+  html += `<div style="display:flex; gap:8px;">
+    <input type="text" id="admin-reset-pw-input" placeholder="초기화할 심사위원 이름 정확히 입력" style="flex:1; padding:10px 16px; background:rgba(0,0,0,0.2); border:1px solid var(--border); color:white; border-radius:8px;">
+    <button style="padding:10px 24px; border-radius:8px; background:var(--danger); color:white; font-weight:700; cursor:pointer; border:none;" onclick="resetJudgePasswordAdmin()">초기화 실행</button>
+  </div>`;
+  
+  return html;
+}
+
+async function deleteEvalAdmin(appName, judgeName) {
+  if (!confirm(`정말 ${judgeName} 님의 '${appName}'에 대한 평가 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) return;
+  try {
+    const res = await fetch('/api/evaluations/delete', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ adminPassword, applicantName: appName, judgeName })
+    });
+    if (!res.ok) throw new Error(await res.text());
+    alert('데이터가 삭제되었습니다.');
+    loadEvaluations(); // reload all
+    setTimeout(() => { if (selectedApplicant) renderEvalForm(selectedApplicant); }, 500);
+  } catch (e) {
+    alert('삭제 실패: ' + e.message);
+  }
+}
+
+async function resetJudgePasswordAdmin() {
+  const targetJudge = document.getElementById('admin-reset-pw-input').value.trim();
+  if (!targetJudge) return alert('심사위원 이름을 입력하세요.');
+  if (targetJudge === 'admin') return alert('어드민 비밀번호는 초기화할 수 없습니다.');
+  if (!confirm(`${targetJudge} 님의 비밀번호를 초기화하시겠습니까?`)) return;
+  
+  try {
+    const res = await fetch('/api/auth/reset', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ adminPassword, targetJudge })
+    });
+    if (!res.ok) throw new Error(await res.text());
+    alert(`${targetJudge} 님의 비밀번호가 초기화되었습니다. 다음 접속 시 새로 설정할 수 있습니다.`);
+    document.getElementById('admin-reset-pw-input').value = '';
+  } catch (e) {
+    alert('초기화 실패: ' + e.message);
+  }
+}
+
+init();
+</script>
+</body>
+</html>

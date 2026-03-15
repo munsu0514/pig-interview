@@ -1,0 +1,16 @@
+{
+  "name": "pig-interview-helper",
+  "version": "1.0.0",
+  "description": "PIG 신입부원 면접 도우미",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.22.1",
+    "pdf-parse": "^2.4.5",
+    "pdf2json": "^4.0.2",
+    "xlsx": "^0.18.5"
+  }
+}
